@@ -1,6 +1,6 @@
 # simple_solar_system.py
 
-from solarsystem import SolarSystem, Sun, Planet
+from solarsystemturtle import SolarSystem, Sun, Planet
 
 solar_system = SolarSystem(width=1400, height=900)
 
@@ -20,6 +20,6 @@ planets = (
     ),
 )
 
-while True:
+for i in range(10000):
     solar_system.calculate_all_body_interactions()
     solar_system.update_all()

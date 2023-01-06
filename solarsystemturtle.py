@@ -2,12 +2,14 @@
 
 import itertools
 import math
+import turtle
 
 
 # Solar System Bodies
-class SolarSystemBody():
-    min_display_size = 200
+class SolarSystemBody(turtle.Turtle):
+    min_display_size = 20
     display_log_base = 1.1
+
     def __init__(
             self,
             solar_system,
@@ -18,29 +20,26 @@ class SolarSystemBody():
         super().__init__()
         self.history = []
         self.mass = mass
-        self.position = position
+        self.setposition(position)
         self.velocity = velocity
         self.display_size = max(
             math.log(self.mass, self.display_log_base),
             self.min_display_size,
         )
+
+        self.penup()
+        self.hideturtle()
+
         solar_system.add_body(self)
 
+    def draw(self):
+        self.clear()
+        self.dot(self.display_size)
+
     def move(self):
-        self.history.append([self.position[0], self.position[1]])
-        self.position = (self.position[0] + self.velocity[0], self.position[1] + self.velocity[1])
-
-    def distance(self, planet):
-        value = math.sqrt((self.position[0] - planet.position[0])**2 + (self.position[1] - planet.position[1])**2)
-        print(value)
-        return value
-
-    def towards(self, planet):
-        x = planet.position[0]
-        y = planet.position[1]
-        x = x - self.position[0]
-        y = y - self.position[1]
-        return round(math.atan2(y,x)*180.0/math.pi, 10) % 360.0
+        self.history.append([self.xcor(), self.ycor()])
+        self.setx(self.xcor() + self.velocity[0])
+        self.sety(self.ycor() + self.velocity[1])
 
 
 class Sun(SolarSystemBody):
@@ -52,8 +51,7 @@ class Sun(SolarSystemBody):
             velocity=(0, 0),
     ):
         super().__init__(solar_system, mass, position, velocity)
-        self.color = "yellow"
-
+        self.color("yellow")
 
 
 class Planet(SolarSystemBody):
@@ -67,30 +65,31 @@ class Planet(SolarSystemBody):
             velocity=(0, 0),
     ):
         super().__init__(solar_system, mass, position, velocity)
-        self.color= next(Planet.colours)
+        self.color(next(Planet.colours))
 
 
 # Solar System
 class SolarSystem:
     def __init__(self, width, height):
-        self.biggest_distance_loss = 0
-        self.second_planet_radius = None
-        #self.solar_system
+        self.solar_system = turtle.Screen()
+        self.solar_system.tracer(0)
+        self.solar_system.setup(width, height)
+        self.solar_system.bgcolor("black")
+
         self.bodies = []
 
     def add_body(self, body):
         self.bodies.append(body)
 
     def remove_body(self, body):
-        #body.clear()
+        body.clear()
         self.bodies.remove(body)
 
     def update_all(self):
         for body in self.bodies:
             body.move()
-
-        self.biggest_distance_loss_three_body()
-        #self.solar_system.update()
+            body.draw()
+        self.solar_system.update()
 
     @staticmethod
     def accelerate_due_to_gravity(
@@ -113,12 +112,10 @@ class SolarSystem:
     def check_collision(self, first, second):
         if isinstance(first, Planet) and isinstance(second, Planet):
             return
-        if first.distance(second) < first.display_size/2 + second.display_size/2:
+        if first.distance(second) < first.display_size / 2 + second.display_size / 2:
             for body in first, second:
                 if isinstance(body, Planet):
-                    print('colision')
-                    #self.remove_body(body)
-                    #self.biggest_distance_loss = 1000
+                    self.remove_body(body)
 
     def calculate_all_body_interactions(self):
         bodies_copy = self.bodies.copy()
@@ -126,15 +123,3 @@ class SolarSystem:
             for second in bodies_copy[idx + 1:]:
                 self.accelerate_due_to_gravity(first, second)
                 self.check_collision(first, second)
-
-    def biggest_distance_loss_three_body(self):
-        print(self.bodies)
-        for body in self.bodies:
-            print(body.history[0])
-            print(body.position)
-            body_initial_radius = math.sqrt(body.history[0][0] ** 2 + body.history[0][1] ** 2)
-            body_present_radius = math.sqrt(body.position[0]**2 + body.position[1]**2)
-            loss_radius = math.log(abs(body_initial_radius - body_present_radius)+3)
-
-            if loss_radius > self.biggest_distance_loss:
-                self.biggest_distance_loss = loss_radius
