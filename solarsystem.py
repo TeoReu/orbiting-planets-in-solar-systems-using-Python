@@ -32,7 +32,7 @@ class SolarSystemBody():
 
     def distance(self, planet):
         value = math.sqrt((self.position[0] - planet.position[0])**2 + (self.position[1] - planet.position[1])**2)
-        print(value)
+        #print(value)
         return value
 
     def towards(self, planet):

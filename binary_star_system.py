@@ -3,14 +3,13 @@ from solarsystemturtle import SolarSystem, Sun, Planet
 
 solar_system = SolarSystem(width=1400, height=900)
 
-
 suns = (
-    Sun(solar_system, mass=100, position=(5, 5), velocity=(5, 5)),
-    Sun(solar_system, mass=100, position=(-5, 5), velocity=(-5, 5)),
-    Sun(solar_system, mass=100, position=(5, -5), velocity=(5, -5)),
-    Sun(solar_system, mass=100, position=(-5, -5), velocity=(-5, -5))
+    Sun(solar_system, mass=10000, position=(-200, 0), velocity=(0, 3)),
+    Sun(solar_system, mass=10000, position=(200, 0), velocity=(0, -3)),
 )
 
+planets = (
+)
 
 while True:
     solar_system.calculate_all_body_interactions()
