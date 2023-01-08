@@ -4,7 +4,6 @@ import itertools
 import math
 import turtle
 
-
 # Solar System Bodies
 class SolarSystemBody(turtle.Turtle):
     min_display_size = 20
@@ -66,6 +65,26 @@ class Planet(SolarSystemBody):
     ):
         super().__init__(solar_system, mass, position, velocity)
         self.color(next(Planet.colours))
+        angle = math.atan2(self.pos()[1], self.pos()[0])
+
+        cos = math.cos(angle)
+        sin = math.sin(angle)
+
+        self.velocity = (-sin * self.velocity, cos * self.velocity)
+
+class Earth(SolarSystemBody):
+
+    def __init__(
+            self,
+            solar_system,
+            mass,
+            sun,
+            position=(0, 0),
+
+    ):
+        super().__init__(solar_system, mass, position, sun)
+        self.velocity = (0, math.sqrt(sun.mass / self.distance(sun)))
+        self.color("pink")
 
 
 # Solar System
@@ -123,3 +142,4 @@ class SolarSystem:
             for second in bodies_copy[idx + 1:]:
                 self.accelerate_due_to_gravity(first, second)
                 self.check_collision(first, second)
+
