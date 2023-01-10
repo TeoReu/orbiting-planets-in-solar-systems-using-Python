@@ -2,7 +2,8 @@
 
 import itertools
 import math
-
+import numpy as np
+import matplotlib.pyplot as plt
 
 # Solar System Bodies
 class SolarSystemBody():
@@ -52,7 +53,7 @@ class Sun(SolarSystemBody):
             velocity=(0, 0),
     ):
         super().__init__(solar_system, mass, position, velocity)
-        self.color = "yellow"
+        self.color = "y"
 
 
 
@@ -97,7 +98,10 @@ class SolarSystem:
             first: SolarSystemBody,
             second: SolarSystemBody,
     ):
-        force = first.mass * second.mass / first.distance(second) ** 2
+        if first.distance(second) != 0:
+            force = first.mass * second.mass / first.distance(second) ** 2
+        else:
+            force = first.mass * second.mass / 0.000000001
         angle = first.towards(second)
         reverse = 1
         for body in first, second:
@@ -113,12 +117,18 @@ class SolarSystem:
     def check_collision(self, first, second):
         if isinstance(first, Planet) and isinstance(second, Planet):
             return
+        if first.distance(second) == 0 or second.distance(first) == 0:
+            for body in first, second:
+                if isinstance(body, Planet):
+                    print('colision')
+                    self.remove_body(body)
+                    self.biggest_distance_loss = 1000
         if first.distance(second) < first.display_size/2 + second.display_size/2:
             for body in first, second:
                 if isinstance(body, Planet):
                     print('colision')
-                    #self.remove_body(body)
-                    #self.biggest_distance_loss = 1000
+                    self.remove_body(body)
+                    self.biggest_distance_loss = 1000
 
     def calculate_all_body_interactions(self):
         bodies_copy = self.bodies.copy()
@@ -128,13 +138,25 @@ class SolarSystem:
                 self.check_collision(first, second)
 
     def biggest_distance_loss_three_body(self):
-        print(self.bodies)
         for body in self.bodies:
-            print(body.history[0])
-            print(body.position)
             body_initial_radius = math.sqrt(body.history[0][0] ** 2 + body.history[0][1] ** 2)
             body_present_radius = math.sqrt(body.position[0]**2 + body.position[1]**2)
-            loss_radius = math.log(abs(body_initial_radius - body_present_radius)+3)
+            loss_radius = math.log(abs(body_initial_radius - body_present_radius))
 
             if loss_radius > self.biggest_distance_loss:
                 self.biggest_distance_loss = loss_radius
+
+    def plot_trajectories(self):
+        for body in self.bodies:
+            hist = np.array(body.history).T
+            plt.plot(hist[0], hist[1])
+            plt.scatter(hist[0][0], hist[1][0], s=100)
+        plt.show()
+
+    def plot_trajectories_time(self, until_time):
+        for body in self.bodies:
+            hist = np.array(body.history[:until_time]).T
+            plt.plot(hist[0], hist[1], body.color)
+            plt.scatter(hist[0][0], hist[1][0], c=body.color, s=100)
+        plt.show()
+

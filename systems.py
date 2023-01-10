@@ -1,7 +1,7 @@
 import GPyOpt
 import numpy as np
 
-from solarsystem import SolarSystem, Sun, Planet
+from solar_system import SolarSystem, Sun, Planet
 
 
 def simulate_system_third_body_position_lagrange(var):
