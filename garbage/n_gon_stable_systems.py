@@ -5,7 +5,7 @@ import numpy as np
 
 from solar_system import SolarSystem, Sun, Planet
 
-mass = 1
+mass = 500
 nr_bodies = 3
 def simulate_n_gon_system_small_search(var):
     solar_system = SolarSystem(width=1000, height=1000)
@@ -22,6 +22,7 @@ def simulate_n_gon_system_small_search(var):
         solar_system.calculate_all_body_interactions()
         solar_system.update_all()
 
+    print(solar_system.biggest_distance_loss)
     return np.float(solar_system.biggest_distance_loss)
 
 
@@ -75,12 +76,12 @@ def evaluate_solution_for_n_gon(n_gon):
         solar_system.calculate_all_body_interactions()
         solar_system.update_all()
 
-    print(solar_system.biggest_distance_loss)
+    print(solar_system.biggest_area_loss)
     print(n_gon.x_opt)
     solar_system.plot_trajectories()
 
 def run_big_experiment():
-    space = [{'name': 'radius', 'type': 'continuous', 'domain': (50, 100)},
+    space = [{'name': 'radius', 'type': 'continuous', 'domain': (150, 250)},
              {'name': 'vel_obj_1_x', 'type': 'continuous', 'domain': (-14, 14)},
              {'name': 'vel_obj_1_y', 'type': 'continuous', 'domain': (-14, 14)},
              {'name': 'vel_obj_2_x', 'type': 'continuous', 'domain': (-14, 14)},
@@ -96,16 +97,16 @@ def run_big_experiment():
     evaluate_solution_for_n_gon(n_gon)
 
 def run_small_experiment():
-    space = [{'name': 'radius', 'type': 'continuous', 'domain': (0, 10)},
+    space = [{'name': 'radius', 'type': 'continuous', 'domain': (0, 20)},
              {'name': 'vel_obj_1_x', 'type': 'continuous', 'domain': (-10, 10)},
              {'name': 'vel_obj_1_y', 'type': 'continuous', 'domain': (-10, 10)},]
 
     n_gon = GPyOpt.methods.BayesianOptimization(f=simulate_n_gon_system_small_search,
-                                                    domain=space)
+                                                    domain=space, initial_design_numdata=20, initial_design_type='latin')
 
     print(n_gon.get_evaluations())
-    for i in range(4):
-        n_gon.run_optimization(100)
+    for i in range(2):
+        n_gon.run_optimization(20)
         evaluate_solution_for_n_gon(n_gon)
 
 
