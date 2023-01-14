@@ -134,6 +134,7 @@ class SolarSystem:
         if first.distance(second) < first.display_size / 2 + second.display_size / 2:
             for body in first, second:
                 if isinstance(body, Planet):
+                    continue
                     self.remove_body(body)
 
     def calculate_all_body_interactions(self):

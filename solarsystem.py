@@ -104,6 +104,9 @@ class SolarSystem:
         self.bodies = []
         self.period = []
 
+        self.rotations = 0
+        self.passed = False
+
     def add_body(self, body):
         self.bodies.append(body)
 
@@ -140,12 +143,14 @@ class SolarSystem:
     def check_collision(self, first, second):
         if isinstance(first, Planet) and isinstance(second, Planet):
             return
-        if first.distance(second) < first.display_size/2 + second.display_size/2:
+        if first.distance(second) < 1: #first.display_size/2 + second.display_size/2:
             for body in first, second:
                 if isinstance(body, Planet):
-                    print('colision')
+                    continue
+                    #print('colision')
                     #self.remove_body(body)
-                    #self.biggest_distance_loss = 1000
+                    #self.biggest_angle_loss = 50
+
 
     def calculate_all_body_interactions(self):
         bodies_copy = self.bodies.copy()
@@ -155,7 +160,7 @@ class SolarSystem:
                 self.check_collision(first, second)
 
     def biggest_distance_loss_three_body(self):
-        print(self.bodies)
+        #print(self.bodies)
         for body in self.bodies:
             body_initial_radius = math.sqrt(body.history[0][0] ** 2 + body.history[0][1] ** 2)
             body_present_radius = math.sqrt(body.position[0]**2 + body.position[1]**2)
@@ -185,33 +190,121 @@ class SolarSystem:
             current_angle = np.arccos(dot_product_2)
 
             angle_diff = abs(initial_angle - current_angle)
-            self.accumulated_angle_loss += angle_diff
+
             if angle_diff > self.biggest_angle_loss:
                 self.biggest_angle_loss = angle_diff
-                print(angle_diff)
+
+            # initial_unit_vector_earth2 = [x*-1 for x in earth.history[0]] / np.linalg.norm([x*-1 for x in earth.history[0]])
+            # initial_unit_vector_satelitte2 = [x-y for x,y in zip(satelitte.history[0],earth.history[0])] / np.linalg.norm([x-y for x,y in zip(satelitte.history[0],earth.history[0])])
+            # dot_product2 = np.dot(initial_unit_vector_earth2, initial_unit_vector_satelitte2)
+            # initial_angle2 = np.arccos(dot_product2)
+            #
+            # current_unit_vector_earth2 = [x*-1 for x in earth.position] / np.linalg.norm([x*-1 for x in earth.position])
+            # current_unit_vector_satelitte2 = [x-y for x,y in zip(satelitte.position,earth.position)] / np.linalg.norm([x-y for x,y in zip(satelitte.position,earth.position)])
+            # dot_product_2 = np.dot(current_unit_vector_earth2, current_unit_vector_satelitte2)
+            # current_angle2 = np.arccos(dot_product_2)
+            #
+            # angle_diff2 = abs(initial_angle2 - current_angle2)
+
+
+            # if angle_diff > 3.10 and not self.passed:
+            #     self.rotations += 1
+            #     self.passed = True
+            #
+            # if  3.14/2 < angle_diff < 3.14/2 + 0.1 and satelitte.position[1] < 0:
+            #     self.passed = False
+            #
+            # if self.rotations > 0:
+            #     #print("hello")
+            #     if satelitte.position[1] < 0:
+            #         self.accumulated_angle_loss += math.pi*self.rotations + math.pi-angle_diff
+            #     else:
+            #         self.accumulated_angle_loss += math.pi * self.rotations + math.pi + angle_diff
+            #
+            # else:
+            #     self.accumulated_angle_loss += angle_diff
+            #
+            #
+            # if self.rotations > 0:
+            #     #print("hello")
+            #     if satelitte.position[1] < 0:
+            #         diff = math.pi*self.rotations + math.pi-angle_diff
+            #     else:
+            #         diff = math.pi * self.rotations + math.pi + angle_diff
+            #
+            # else:
+            #     diff = angle_diff
+            #
+            # if diff > self.biggest_angle_loss:
+            #     self.biggest_angle_loss = diff
+
+
+
+
+
+            # if angle_diff2 > 3.10 and not self.passed:
+            #     self.rotations += 1
+            #     self.passed = True
+            #
+            # if  3.14/2 < angle_diff2 < 3.14/2 + 0.1 and satelitte.position[1] < 0:
+            #     self.passed = False
+            #
+            # if self.rotations > 0:
+            #     #print("hello")
+            #     if satelitte.position[1] < 0:
+            #         self.accumulated_angle_loss += math.pi*self.rotations + math.pi-angle_diff
+            #     else:
+            #         self.accumulated_angle_loss += math.pi * self.rotations + math.pi + angle_diff
+            #
+            # else:
+            #     self.accumulated_angle_loss += angle_diff
+            #
+            #
+            # if self.rotations > 0:
+            #     #print("hello")
+            #     if satelitte.position[1] < 0:
+            #         diff = math.pi*self.rotations + math.pi-angle_diff
+            #     else:
+            #         diff = math.pi * self.rotations + math.pi + angle_diff
+            #
+            # else:
+            #     diff = angle_diff
+            #
+            # if diff > self.biggest_angle_loss:
+            #     self.biggest_angle_loss = diff
+
+
+
+
+            # combined_diff = angle_diff2 + angle_diff
+            #
+            # if angle_diff2 > self.biggest_angle_loss:
+            #     self.biggest_angle_loss = angle_diff2
 
 
 
 
     def get_biggest_distance_loss(self, iterations):
-        for i in range(1000):
+        for i in range(iterations):
             self.calculate_all_body_interactions()
             self.update_all()
 
         return np.float(self.biggest_distance_loss)
 
     def accumulated_distance_and_angle_loss_three_body(self, iterations):
-        for i in range(1000):
+        for i in range(iterations):
             self.calculate_all_body_interactions()
             self.update_all()
 
-        return math.log10(np.float(self.accumulated_distance_loss)) + math.log10(np.float(self.accumulated_angle_loss))*4
+        return math.log2(np.float(self.accumulated_distance_loss)) + math.log2(np.float(self.accumulated_angle_loss))#*4
 
     def distance_and_angle_loss_three_body(self, iterations):
-        for i in range(1000):
+        for i in range(iterations):
             self.calculate_all_body_interactions()
             self.update_all()
 
+        print(np.float(self.biggest_angle_loss))
+        #return np.float(self.biggest_angle_loss)
         return np.float(self.biggest_distance_loss) + np.float(self.biggest_angle_loss)*4
 
     def period_distance(self,x,y):
